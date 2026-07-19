@@ -53,6 +53,7 @@ To strictly reproduce the analytical tables presented in the published manuscrip
 ```bash
 python imbalance_study.py
 ```
+*(Note: After determining the optimal balancing strategy from this stage, ensure you update the `imbalance_strategy` field in `configs/config.yaml` before running subsequent stages).*
 
 **Stage 2: Baseline Model Comparisons (Table 2)**
 ```bash
@@ -61,17 +62,17 @@ python compare_models.py
 
 **Stage 3: Architectural Ablation Study (Table 3)**
 ```bash
-python stage4_ablation.py
+python ablation_study.py
 ```
 
 **Stage 4: Token-Level Attention Analysis (Table 4)**
 ```bash
-python stage5_attention_analysis.py
+python attention_analysis.py
 ```
 
 **Stage 5: Robustness via 5-Fold Cross Validation (Table 5)**
 ```bash
-python stage6_robustness_cv.py
+python robustness_cv.py
 ```
 
 All generated metrics, confusion matrices, and attention distribution logs will automatically be saved and formatted in the `outputs/` directory.
