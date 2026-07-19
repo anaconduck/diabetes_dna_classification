@@ -1,0 +1,35 @@
+datasets:
+  data_path: "data/dataset.csv"
+  test_size: 0.1
+  random_state: 42
+  imbalance_strategy: "undersample"
+  minority_class: 0
+  majority_class: 1
+  undersample_n_samples: 220
+
+encoding:
+  type: "kmer_word2vec"
+  kmer_size: 3
+  word2vec:
+    min_count: 1
+    window: 5
+    vector_size: 100
+    workers: 2
+  
+models:
+  type: "lstm" 
+  lstm:
+    lstm_units: 50
+    dense_units_1: 50
+    dense_units_2: 50
+    dropout_rate: 0.2
+    output_units: 1
+
+training:
+  optimizer: "adam"
+  epochs: 100
+  batch_size: 32
+
+paths:
+  weights_dir: "weights/"
+  outputs_dir: "outputs/"
