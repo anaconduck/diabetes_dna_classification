@@ -31,52 +31,32 @@ Unlike traditional methods that rely on static Bag-of-K-mers (which destroy spat
    ```
 2. Place your raw genomic data (`dataset.csv`) inside the `data/` directory.
 
-## 🧠 Training & Evaluation
-
-The entire experimental pipeline (from Word2Vec embedding to 5-Fold Cross-Validation) is modularized. To execute the primary training pipeline:
-```bash
-python train.py
-```
-
-This master script will:
-1. Parse the `config.yaml` configuration.
-2. Balance the dataset via Random Undersampling.
-3. Train the $k=3, 4, 5$ Word2Vec CBOW embeddings.
-4. Dynamically fuse the scales via the Scale Attention layer.
-5. Train the sequence-masked LSTM model.
-6. Output comprehensive evaluation metrics to the `outputs/` folder.
-
-### 🏆 State-of-the-Art Performance (Showcase Mode)
-The default `config.yaml` is currently pre-configured with a highly optimized hyperparameter setup (utilizing `random_state: 23`, `dropout_rate: 0.3`, `vector_size: 128`, alongside strict L2 Regularization and Early Stopping). 
-
-Running a single `python train.py` execution will directly yield showcase-level metrics on the test split.
-
 
 ## 🔬 Reproducing the Journal Experiments
 To strictly reproduce the analytical tables presented in the published manuscript, you can run the individual stage scripts in the following order:
 
-**Stage 1: Impact of Imbalance Strategies (Table 1)**
+**Stage 1: Impact of Imbalance Strategies**
 ```bash
 python imbalance_study.py
 ```
 *(Note: After determining the optimal balancing strategy from this stage, ensure you update the `imbalance_strategy` field in `configs/config.yaml` before running subsequent stages).*
 
-**Stage 2: Baseline Model Comparisons (Table 2)**
+**Stage 2: Baseline Model Comparisons**
 ```bash
 python compare_models.py
 ```
 
-**Stage 3: Architectural Ablation Study (Table 3)**
+**Stage 3: Architectural Ablation Study**
 ```bash
 python ablation_study.py
 ```
 
-**Stage 4: Token-Level Attention Analysis (Table 4)**
+**Stage 4: Token-Level Attention Analysis**
 ```bash
 python attention_analysis.py
 ```
 
-**Stage 5: Robustness via 5-Fold Cross Validation (Table 5)**
+**Stage 5: Robustness via 5-Fold Cross Validation**
 ```bash
 python robustness_cv.py
 ```
