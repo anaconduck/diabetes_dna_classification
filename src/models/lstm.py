@@ -8,7 +8,7 @@ def build_lstm_model(config):
     dense_2 = config['models']['lstm']['dense_units_2']
     dropout = config['models']['lstm']['dropout_rate']
     output_units = config['models']['lstm']['output_units']
-    use_scale_attention = config['models'].get('use_scale_attention', False)
+    use_scale_attention = config['models'].get('lstm', {}).get('use_scale_attention', False)
     
     # Check if we are using adaptive multi-scale
     encoding_type = config['encoding'].get('type', 'kmer_word2vec')
@@ -36,9 +36,13 @@ def build_lstm_model(config):
     # x is now (batch_size, sequence_length, vector_size)
     # Mask out the [PAD] zero-vectors so LSTM ignores them
     x = keras.layers.Masking(mask_value=0.0)(x)
-    x = keras.layers.LSTM(units=lstm_units, activation='tanh')(x) # standard tanh to prevent exploding gradients
-    x = keras.layers.Dense(units=dense_1, activation='relu')(x)
-    x = keras.layers.Dense(units=dense_2, activation='relu')(x)
+    
+    # Apply L2 regularization to heavily penalize large weights and reduce overfitting on small dataset
+    l2_reg = tf.keras.regularizers.l2(1e-3)
+    
+    x = keras.layers.LSTM(units=lstm_units, activation='tanh', kernel_regularizer=l2_reg)(x) # standard tanh to prevent exploding gradients
+    x = keras.layers.Dense(units=dense_1, activation='relu', kernel_regularizer=l2_reg)(x)
+    x = keras.layers.Dense(units=dense_2, activation='relu', kernel_regularizer=l2_reg)(x)
     x = keras.layers.Dropout(rate=dropout)(x)
     outputs = keras.layers.Dense(units=output_units, activation='sigmoid')(x)
     

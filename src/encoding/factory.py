@@ -12,7 +12,7 @@ class EncoderFactory:
         self.encoding_type = config.get('encoding', {}).get('type', 'kmer_word2vec')
         
     def extract_features(self, dataset):
-        ksize = self.config['encoding']['kmer_size']
+        ksize = self.config['encoding'].get('kmer_size', 3)
         model_type = self.config.get('models', {}).get('type', 'lstm')
         is_sequential = model_type in ['lstm', 'attention_lstm', 'cnn']
         
@@ -64,7 +64,7 @@ class EncoderFactory:
             else:
                 return create_seqs_embedding(embedder_model, multi_kmers, vector_size)
         elif self.encoding_type == 'one_hot':
-            ksize = self.config['encoding']['kmer_size']
+            ksize = self.config['encoding'].get('kmer_size', 3)
             multi_kmers, _ = features
             return create_one_hot_embeddings(multi_kmers, ksize)
         elif self.encoding_type == 'adaptive_word2vec':

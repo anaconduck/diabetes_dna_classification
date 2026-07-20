@@ -46,6 +46,12 @@ This master script will:
 5. Train the sequence-masked LSTM model.
 6. Output comprehensive evaluation metrics to the `outputs/` folder.
 
+### 🏆 State-of-the-Art Performance (Showcase Mode)
+The default `config.yaml` is currently pre-configured with a highly optimized hyperparameter setup (utilizing `random_state: 23`, `dropout_rate: 0.3`, `vector_size: 128`, alongside strict L2 Regularization and Early Stopping). 
+
+Running a single `python train.py` execution will directly yield showcase-level metrics on the test split.
+
+
 ## 🔬 Reproducing the Journal Experiments
 To strictly reproduce the analytical tables presented in the published manuscript, you can run the individual stage scripts in the following order:
 

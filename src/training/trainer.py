@@ -38,11 +38,20 @@ def train_model(model, X_train, Y_train, X_val, Y_val, config, class_weights=Non
                       loss=tf.keras.losses.BinaryCrossentropy(),
                       metrics=['accuracy'])
         
+        # Add Early Stopping to prevent overfitting and restore best golden epoch weights
+        early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss', 
+            patience=15, 
+            restore_best_weights=True,
+            verbose=1
+        )
+        
         history = model.fit(X_train_final, Y_train_np, 
                             epochs=epochs, 
                             batch_size=batch_size, 
                             validation_data=(X_val_final, Y_val_np),
-                            class_weight=class_weights)
+                            class_weight=class_weights,
+                            callbacks=[early_stopping])
     else:
         print(f"Training Scikit-Learn model ({model_type})...")
         model.fit(X_train_final, Y_train_np)
