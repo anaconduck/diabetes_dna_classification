@@ -32,7 +32,7 @@ Unlike traditional methods that rely on static Bag-of-K-mers (which destroy spat
 2. Place your raw genomic data (`dataset.csv`) inside the `data/` directory.
 
 
-## 🔬 Reproducing the Journal Experiments
+## Reproducing the Journal Experiments
 To strictly reproduce the analytical tables presented in the published manuscript, you can run the individual stage scripts in the following order:
 
 **Stage 1: Impact of Imbalance Strategies**
