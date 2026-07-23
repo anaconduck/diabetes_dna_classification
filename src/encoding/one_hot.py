@@ -2,19 +2,11 @@ import numpy as np
 import itertools
 
 def get_kmer_vocabulary(ksize):
-    """
-    Generates all possible DNA k-mers of length `ksize`.
-    """
     bases = ['A', 'C', 'G', 'T']
     kmers = [''.join(p) for p in itertools.product(bases, repeat=ksize)]
     return {kmer: i for i, kmer in enumerate(kmers)}
 
 def create_one_hot_embeddings(features, ksize):
-    """
-    Converts a list of k-mer sequences (features) into K-mer Frequency Spectrum (Bag-of-K-mers).
-    Note: Function is named one_hot for legacy compatibility, but computes normalized frequencies.
-    Returns a numpy array of shape (num_samples, 4^ksize).
-    """
     vocab = get_kmer_vocabulary(ksize)
     vocab_size = len(vocab)
     

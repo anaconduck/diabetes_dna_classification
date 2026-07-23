@@ -2,9 +2,6 @@ import tensorflow as tf
 from tensorflow import keras
 
 def build_cnn_model(config):
-    """
-    Builds a 1D Convolutional Neural Network.
-    """
     vector_size = config['models'].get('computed_input_dim', config['encoding']['word2vec']['vector_size'])
     
     model_cfg = config['models'].get('cnn', config['models']['lstm'])

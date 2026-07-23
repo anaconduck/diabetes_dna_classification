@@ -5,10 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
 
 def load_and_preprocess_data(config):
-    """
-    Loads dataset, applies undersampling to balance classes, 
-    and splits into training and testing sets.
-    """
     data_path = config['datasets']['data_path']
     test_size = config['datasets']['test_size']
     random_state = config['datasets']['random_state']
@@ -43,7 +39,7 @@ def load_and_preprocess_data(config):
                                               test_size=test_size, 
                                               random_state=random_state)
                                               
-    # Compute Class Weights if strategy requires it
+    # Compute Class Weights
     class_weights = None
     if imbalance_strategy == 'class_weight':
         classes = np.unique(training_set['class'])

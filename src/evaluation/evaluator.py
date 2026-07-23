@@ -5,9 +5,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.metrics import classification_report, confusion_matrix
 
 def evaluate_model(model, X_test, Y_test, config):
-    """
-    Evaluates the model and saves the classification report.
-    """
     outputs_dir = config['paths']['outputs_dir']
     os.makedirs(outputs_dir, exist_ok=True)
     prefix = config.get('run_prefix', '')
@@ -17,7 +14,6 @@ def evaluate_model(model, X_test, Y_test, config):
     model_type = config['models'].get('type', 'lstm')
     is_keras = hasattr(model, 'compile')
     
-    # Reshape if necessary
     X_test_final = X_test
     if is_keras and model_type in ['lstm', 'attention_lstm', 'cnn']:
         if len(X_test.shape) == 2:
@@ -29,12 +25,10 @@ def evaluate_model(model, X_test, Y_test, config):
         y_pred_prob = model.predict(X_test_final).flatten()
         y_pred = np.where(y_pred_prob > 0.5, 1, 0)
     else:
-        # Scikit-learn
         y_pred = model.predict(X_test_final)
         if hasattr(model, "predict_proba"):
             y_pred_prob = model.predict_proba(X_test_final)[:, 1]
         else:
-            # Fallback if probability is not supported
             y_pred_prob = y_pred
 
     Y_test_np = np.array(Y_test)
@@ -48,7 +42,7 @@ def evaluate_model(model, X_test, Y_test, config):
     try:
         roc_auc = roc_auc_score(Y_test_np, y_pred_prob)
     except ValueError:
-        pass # In case there's only one class in y_true
+        pass
         
     print(f"Accuracy: {accuracy}")
     print(f"Precision: {precision}")
@@ -64,7 +58,7 @@ def evaluate_model(model, X_test, Y_test, config):
     class_report = classification_report(Y_test_np, y_pred, zero_division=0)
     print(class_report)
     
-    # Save the report to a file
+    # Save the report 
     report_path = os.path.join(outputs_dir, f"{prefix}classification_report.txt")
     with open(report_path, "w") as f:
         f.write(f"Accuracy: {accuracy}\n")
@@ -97,10 +91,6 @@ def evaluate_model(model, X_test, Y_test, config):
     return accuracy, precision, recall, f1, roc_auc
 
 def plot_history(history, config):
-    """
-    Plots the training and validation accuracy and loss over epochs.
-    For Scikit-Learn models, history will be None, so we skip plotting.
-    """
     if history is None:
         print("Skipping history plot (not a Keras model).")
         return

@@ -4,9 +4,6 @@ from src.models.cnn import build_cnn_model
 from src.models.traditional_ml import build_rf_model, build_svm_model
 
 def get_model(config):
-    """
-    Factory function to build the model based on the configuration.
-    """
     model_type = config.get('models', {}).get('type', 'lstm')
     
     if model_type == 'lstm':

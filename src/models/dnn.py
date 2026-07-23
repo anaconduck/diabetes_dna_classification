@@ -2,12 +2,8 @@ import tensorflow as tf
 from tensorflow import keras
 
 def build_dnn_model(config):
-    """
-    Builds a standard Deep Neural Network (Multi-Layer Perceptron).
-    """
     vector_size = config['models'].get('computed_input_dim', config['encoding']['word2vec']['vector_size'])
     
-    # Retrieve hyperparameters or fallback to lstm defaults
     model_cfg = config['models'].get('dnn', config['models']['lstm'])
     
     dense_1 = model_cfg.get('dense_units_1', 128)

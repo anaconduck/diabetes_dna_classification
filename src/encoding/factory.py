@@ -4,9 +4,6 @@ from src.adaptive_kmer.adaptive_generator import extract_multi_scale_kmers
 from src.adaptive_kmer.adaptive_representation import train_adaptive_word2vec, create_adaptive_embeddings, create_adaptive_sequence_embeddings
 
 class EncoderFactory:
-    """
-    Factory class to handle sequence encoding based on configuration.
-    """
     def __init__(self, config):
         self.config = config
         self.encoding_type = config.get('encoding', {}).get('type', 'kmer_word2vec')
@@ -30,7 +27,6 @@ class EncoderFactory:
             scales = self.config['encoding'].get('scales', [3, 4, 5])
             features, max_len = extract_multi_scale_kmers(dataset, scales)
             
-            # Since baseline extract_features also extracts labels, we must too
             labels_list = []
             for index, row in dataset.iterrows():
                 labels_list.append(row['class'])
@@ -44,9 +40,9 @@ class EncoderFactory:
             kmers_train = features_train[0]
             return train_or_load_word2vec(kmers_train, self.config, save_dir)
         elif self.encoding_type == 'one_hot':
-            return None # K-mer frequency (legacy name 'one_hot') has no trainable embedder
+            return None 
         elif self.encoding_type == 'adaptive_word2vec':
-            multi_kmers_train = features_train[0] # features_train is (features, max_len)
+            multi_kmers_train = features_train[0]
             return train_adaptive_word2vec(multi_kmers_train, self.config, save_dir)
         else:
             raise ValueError(f"Unknown encoding type: {self.encoding_type}")

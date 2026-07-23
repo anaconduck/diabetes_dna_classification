@@ -4,10 +4,6 @@ import numpy as np
 import pickle
 
 def train_model(model, X_train, Y_train, X_val, Y_val, config, class_weights=None):
-    """
-    Compiles and trains the model (if Keras), then saves the weights.
-    For Scikit-Learn models, it just fits the model.
-    """
     optimizer = config['training'].get('optimizer', 'adam')
     epochs = config['training'].get('epochs', 10)
     batch_size = config['training'].get('batch_size', 32)
