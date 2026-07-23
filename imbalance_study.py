@@ -4,16 +4,10 @@ from src.utils.config_parser import load_config
 from train import main
 
 def run_imbalance_study():
-    """
-    Runs a benchmark across different imbalanced data handling strategies.
-    This helps in selecting the best strategy before doing model selection or feature ablation.
-    """
     base_config = load_config("configs/config.yaml")
     
-    # Strategies to compare
     strategies = ['none', 'undersampling', 'class_weight']
     
-    # Fixed Settings for fair comparison
     fixed_model = 'lstm'
     fixed_encoding = 'kmer_word2vec'
     fixed_ksize = 3
@@ -25,21 +19,16 @@ def run_imbalance_study():
         print(f"TESTING IMBALANCE STRATEGY: {strategy.upper()}")
         print(f"{'='*50}\n")
         
-        # Deep copy to avoid cross-contamination
         run_config = copy.deepcopy(base_config)
         
-        # Enforce fixed baseline
         run_config['models']['type'] = fixed_model
         run_config['encoding']['type'] = fixed_encoding
         run_config['encoding']['kmer_size'] = fixed_ksize
         
-        # Set Strategy
         run_config['datasets']['imbalance_strategy'] = strategy
         
-        # Unique prefix for outputs
         run_config['run_prefix'] = f"imbalance_{strategy}"
         
-        # Run pipeline
         try:
             main(config_dict=run_config)
             
@@ -89,7 +78,6 @@ def run_imbalance_study():
                 'Status': f'Failed: {e}'
             })
             
-    # Save Benchmark Summary
     df_results = pd.DataFrame(results)
     df_results.to_excel("outputs/imbalance_summary.xlsx", index=False)
     print("\nAll imbalance testing completed! See outputs/imbalance_summary.xlsx for details.")

@@ -4,16 +4,10 @@ from src.utils.config_parser import load_config
 from train import main
 
 def run_model_comparison():
-    """
-    Runs a benchmark across different model architectures using a fixed encoding.
-    This helps in selecting the best model before performing feature ablation.
-    """
     base_config = load_config("configs/config.yaml")
     
-    # Models to compare
     models = ['lstm', 'cnn', 'dnn', 'rf', 'svm']
     
-    # Fixed Feature Extraction Settings
     fixed_encoding = 'kmer_word2vec'
     fixed_ksize = 3
     
@@ -34,14 +28,11 @@ def run_model_comparison():
         # Set Model Type
         run_config['models']['type'] = model_type
         
-        # Unique prefix for outputs
         run_config['run_prefix'] = f"benchmark_{model_type}"
         
-        # Run pipeline
         try:
             main(config_dict=run_config)
             
-            # Retrieve metrics
             report_path = f"outputs/benchmark_{model_type}_classification_report.txt"
             accuracy = None
             precision = None
@@ -91,7 +82,6 @@ def run_model_comparison():
                 'ROC-AUC': None
             })
             
-    # Save Benchmark Summary
     df_results = pd.DataFrame(results)
     df_results.to_excel("outputs/model_comparison_summary.xlsx", index=False)
     print("\nAll benchmarking completed! See outputs/model_comparison_summary.xlsx for details.")

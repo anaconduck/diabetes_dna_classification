@@ -10,12 +10,10 @@ def main(config_dict=None):
     print("Loading configuration...")
     config = config_dict if config_dict else load_config("configs/config.yaml")
     
-    print("Loading and preprocessing data...")
     training_set, test_set, class_weights = load_and_preprocess_data(config)
     print(f"Training set shape: {training_set.shape}")
     print(f"Testing set shape: {test_set.shape}")
     
-    print("Initializing Encoder Factory...")
     encoder_factory = EncoderFactory(config)
     
     print("Extracting sequence features...")
@@ -29,7 +27,7 @@ def main(config_dict=None):
     X_train_embedding = encoder_factory.create_embeddings(embedder_model, X_train_features)
     X_test_embedding = encoder_factory.create_embeddings(embedder_model, X_test_features)
     
-    print("Building model via Factory...")
+    print("Building model...")
     model_type = config.get('models', {}).get('type', 'lstm')
     is_sequential = model_type in ['lstm', 'attention_lstm', 'cnn']
     if is_sequential:
@@ -42,12 +40,11 @@ def main(config_dict=None):
     print("Training the model...")
     model, history = train_model(model, X_train_embedding, Y_train, X_test_embedding, Y_test, config, class_weights)
     
-    print("Plotting training history...")
     plot_history(history, config)
     
     print("Evaluating the model...")
     evaluate_model(model, X_test_embedding, Y_test, config)
-    print("Done. Results saved in outputs/ directory.")
+    print("Results saved in outputs/ directory.")
 
 if __name__ == "__main__":
     main()

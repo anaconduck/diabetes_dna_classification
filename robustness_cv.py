@@ -13,7 +13,6 @@ from src.training.trainer import train_model
 from src.evaluation.evaluator import evaluate_model
 
 def apply_imbalance_strategy(df, config):
-    """Applies the selected imbalance strategy on a specific fold's training set."""
     imbalance_strategy = config['datasets'].get('imbalance_strategy', 'none')
     minority_class = config['datasets']['minority_class']
     majority_class = config['datasets']['majority_class']
@@ -47,7 +46,6 @@ def run_robustness_cv():
     
     config = load_config("configs/config.yaml")
     
-    # Force settings for the Super Model
     config['models']['type'] = 'lstm'
     if 'lstm' not in config['models']:
         config['models']['lstm'] = {}
@@ -55,7 +53,6 @@ def run_robustness_cv():
     config['encoding']['type'] = 'adaptive_word2vec'
     config['encoding']['scales'] = [3, 4, 5]
     
-    # Load raw data
     data_path = config['datasets']['data_path']
     if data_path.endswith('.csv'):
         df = pd.read_csv(data_path)
@@ -76,7 +73,6 @@ def run_robustness_cv():
         # Apply Imbalance Strategy ONLY on Training Set
         train_df, class_weights = apply_imbalance_strategy(train_df, config)
         
-        # Unique prefix for this fold
         config['run_prefix'] = f"stage6_fold{fold+1}"
         
         # Feature Extraction
@@ -85,7 +81,7 @@ def run_robustness_cv():
         features_train, Y_train = encoder_factory.extract_features(train_df)
         features_test, Y_test = encoder_factory.extract_features(test_df)
         
-        # Train Word2Vec on this fold's training data
+        # Train Word2Vec 
         print("Training Adaptive Word2Vec...")
         w2v_model = encoder_factory.train_embedder(features_train, config['paths']['weights_dir'])
         
@@ -93,14 +89,11 @@ def run_robustness_cv():
         X_train_embedding = encoder_factory.create_embeddings(w2v_model, features_train)
         X_test_embedding = encoder_factory.create_embeddings(w2v_model, features_test)
         
-        # Model Building
         print("Building Model...")
         model = get_model(config)
         
-        # Train
         model, _ = train_model(model, X_train_embedding, Y_train, X_test_embedding, Y_test, config, class_weights)
         
-        # Evaluate
         accuracy, precision, recall, f1, roc_auc = evaluate_model(model, X_test_embedding, Y_test, config)
         
         fold_metrics.append({
@@ -112,7 +105,6 @@ def run_robustness_cv():
             'ROC-AUC': roc_auc
         })
         
-    # Compute Statistics
     df_results = pd.DataFrame(fold_metrics)
     
     mean_row = {
@@ -135,7 +127,6 @@ def run_robustness_cv():
     
     df_results = pd.concat([df_results, pd.DataFrame([mean_row, std_row])], ignore_index=True)
     
-    # Save to Excel
     outputs_dir = config['paths']['outputs_dir']
     os.makedirs(outputs_dir, exist_ok=True)
     out_path = os.path.join(outputs_dir, "stage6_robustness_summary.xlsx")

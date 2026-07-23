@@ -19,7 +19,6 @@ def run_attention_analysis():
     
     config = load_config("configs/config.yaml")
     
-    # 1. Load Data & Encode
     print("Loading data and generating embeddings...")
     config['encoding']['type'] = 'adaptive_word2vec'
     config['encoding']['scales'] = [3, 4, 5]
@@ -34,7 +33,6 @@ def run_attention_analysis():
     w2v_model = encoder_factory.train_embedder(features_train, config['paths']['weights_dir'])
     X_test_embedding = encoder_factory.create_embeddings(w2v_model, features_test)
     
-    # 2. Load Model
     model_path = os.path.join(config['paths']['weights_dir'], "stage4_baseline_adaptive_multi-scale_scale_attention_model.h5")
     if not os.path.exists(model_path):
         print(f"Model not found at {model_path}. Please run Stage 4 (Ablation Study) first.")
@@ -43,7 +41,6 @@ def run_attention_analysis():
     print(f"Loading model from {model_path}...")
     model = keras.models.load_model(model_path, custom_objects={'ScaleAttention': ScaleAttention})
     
-    # 3. Extract Attention Weights
     attention_layer = None
     for layer in model.layers:
         if isinstance(layer, ScaleAttention):
@@ -54,29 +51,21 @@ def run_attention_analysis():
         print("ScaleAttention layer not found in the model!")
         return
         
-    W = attention_layer.W.numpy() # shape: (vector_size, 1)
-    b = attention_layer.b.numpy() # shape: (1,)
+    W = attention_layer.W.numpy()
+    b = attention_layer.b.numpy()
     
-    # 4. Compute Attention Scores for Test Set manually
-    # X_test_embedding shape: (batch, vector_size, num_scales)
-    # Transpose to (batch, num_scales, vector_size)
     x_transposed = np.transpose(X_test_embedding, axes=[0, 2, 1])
     
-    # Compute scores: (batch, num_scales, 1)
     scores = np.tensordot(x_transposed, W, axes=[[2], [0]]) + b
     scores = np.tanh(scores)
     
-    # Compute alpha (softmax over num_scales axis)
-    alpha = softmax(scores, axis=1) # shape: (batch, num_scales, 1)
-    alpha_squeezed = np.squeeze(alpha, axis=-1) # shape: (batch, num_scales)
+    alpha = softmax(scores, axis=1)
+    alpha_squeezed = np.squeeze(alpha, axis=-1)
     
-    # 5. Analysis & Visualization
     scales = config['encoding']['scales']
     
-    # Global Average
     global_mean_alpha = np.mean(alpha_squeezed, axis=0)
     
-    # Class-wise Average
     Y_test_np = np.array(Y_test)
     class_0_alpha = np.mean(alpha_squeezed[Y_test_np == 0], axis=0)
     class_1_alpha = np.mean(alpha_squeezed[Y_test_np == 1], axis=0)
@@ -85,7 +74,6 @@ def run_attention_analysis():
     for i, scale in enumerate(scales):
         print(f"Scale K={scale} | Global: {global_mean_alpha[i]:.4f} | Normal (0): {class_0_alpha[i]:.4f} | Diabetes (1): {class_1_alpha[i]:.4f}")
         
-    # Plotting
     outputs_dir = config['paths']['outputs_dir']
     os.makedirs(outputs_dir, exist_ok=True)
     
@@ -103,13 +91,12 @@ def run_attention_analysis():
     ax.set_xticklabels([f"K={s}" for s in scales])
     ax.legend()
     
-    # Add values on top of bars
     def autolabel(rects):
         for rect in rects:
             height = rect.get_height()
             ax.annotate(f'{height:.2f}',
                         xy=(rect.get_x() + rect.get_width() / 2, height),
-                        xytext=(0, 3),  # 3 points vertical offset
+                        xytext=(0, 3),
                         textcoords="offset points",
                         ha='center', va='bottom')
                         
